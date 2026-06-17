@@ -1,0 +1,8 @@
+dash
+plotly
+pandas
+pyarrow
+dash-ag-grid
+databricks-sdk
+databricks-sql-connector
+python-dotenv

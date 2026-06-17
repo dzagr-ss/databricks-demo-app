@@ -1,0 +1,9 @@
+command: ["python", "app.py"]
+
+env:
+  - name: GENIE_SPACE_ID
+    valueFrom: genie-space
+  - name: DATABRICKS_WAREHOUSE_ID
+    valueFrom: sql-warehouse
+  - name: DEMO_SCHEMA
+    value: workspace.demo_dash_genie
