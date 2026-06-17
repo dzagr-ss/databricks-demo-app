@@ -1,0 +1,81 @@
+name: Deploy Databricks App
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/deploy-databricks-app.yml"
+      - "app.py"
+      - "app.yaml"
+      - "requirements.txt"
+      - "assets/**"
+      - "revenue_risk_assistant/**"
+      - "sql/**"
+  workflow_dispatch:
+    inputs:
+      app_name:
+        description: "Existing Databricks App name"
+        required: false
+        default: "dash-genie-revenue-risk"
+      workspace_path:
+        description: "Workspace folder to sync source code into"
+        required: false
+        default: "/Workspace/Shared/databricks-demo-app"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: databricks-app-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Sync and deploy
+    runs-on: ubuntu-latest
+    env:
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+      DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+      DATABRICKS_APP_NAME: ${{ github.event.inputs.app_name || vars.DATABRICKS_APP_NAME || 'dash-genie-revenue-risk' }}
+      DATABRICKS_WORKSPACE_PATH: ${{ github.event.inputs.workspace_path || vars.DATABRICKS_WORKSPACE_PATH || '/Workspace/Shared/databricks-demo-app' }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Compile Python files
+        run: python -m compileall app.py revenue_risk_assistant
+
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Verify Databricks authentication
+        run: |
+          set -euo pipefail
+          databricks -v
+          databricks current-user me
+
+      - name: Sync app source to Databricks Workspace
+        run: |
+          set -euo pipefail
+          databricks sync . "$DATABRICKS_WORKSPACE_PATH" \
+            --full \
+            --exclude ".git" \
+            --exclude ".github" \
+            --exclude ".env" \
+            --exclude ".databricks" \
+            --exclude "__pycache__" \
+            --exclude "*.pyc"
+
+      - name: Deploy Databricks App
+        run: |
+          set -euo pipefail
+          databricks apps deploy "$DATABRICKS_APP_NAME" \
+            --source-code-path "$DATABRICKS_WORKSPACE_PATH"

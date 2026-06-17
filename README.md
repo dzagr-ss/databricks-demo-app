@@ -125,6 +125,23 @@ databricks apps deploy dash-genie-revenue-risk \
   --source-code-path /Workspace/Users/<your-email>/databricks-dash-genie-poc
 ```
 
+## GitHub Actions deploy
+
+The repository includes [deploy-databricks-app.yml](.github/workflows/deploy-databricks-app.yml). It validates Python imports, installs the Databricks CLI, syncs the app source into a Databricks Workspace folder, and deploys an existing Databricks App.
+
+Configure these GitHub repository secrets:
+
+- `DATABRICKS_HOST` - workspace URL, for example `https://dbc-...cloud.databricks.com`
+- `DATABRICKS_CLIENT_ID` - Databricks service principal client ID
+- `DATABRICKS_CLIENT_SECRET` - Databricks service principal OAuth secret
+
+Optional GitHub repository variables:
+
+- `DATABRICKS_APP_NAME` - defaults to `dash-genie-revenue-risk`
+- `DATABRICKS_WORKSPACE_PATH` - defaults to `/Workspace/Shared/databricks-demo-app`
+
+The Databricks App must already exist and have its `sql-warehouse` and `genie-space` resources configured. The service principal used by GitHub Actions needs permission to write to `DATABRICKS_WORKSPACE_PATH` and deploy the app.
+
 ## Troubleshooting
 
 - `NO_SUCH_CATALOG_EXCEPTION`: run `SHOW CATALOGS`, pick an existing catalog, rerun the setup SQL in that catalog, and set `DEMO_SCHEMA=<catalog>.demo_dash_genie` in `.env` and `app.yaml`.
