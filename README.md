@@ -142,9 +142,20 @@ Optional GitHub repository variables:
 
 The Databricks App must already exist and have its `sql-warehouse` and `genie-space` resources configured. The service principal used by GitHub Actions needs permission to write to `DATABRICKS_WORKSPACE_PATH` and deploy the app.
 
+If deploy fails with:
+
+```text
+The user is not authorized to make the request, please assign the user: <principal-id> CAN_MANAGE permission for the app: dash-genie-revenue-risk.
+```
+
+grant `CAN MANAGE` on the Databricks App to the service principal used by GitHub Actions. In Databricks, open the app, click **Share**, add the service principal from `DATABRICKS_CLIENT_ID`, choose **CAN MANAGE**, and save.
+
+This is the deployer identity. It is different from the app runtime service principal shown in the app Authorization tab.
+
 ## Troubleshooting
 
 - `NO_SUCH_CATALOG_EXCEPTION`: run `SHOW CATALOGS`, pick an existing catalog, rerun the setup SQL in that catalog, and set `DEMO_SCHEMA=<catalog>.demo_dash_genie` in `.env` and `app.yaml`.
+- App deploy fails with missing `CAN_MANAGE`: grant `CAN MANAGE` on the Databricks App to the service principal used by GitHub Actions.
 - Dashboard query fails: verify `DATABRICKS_WAREHOUSE_ID`, app resource keys, `DEMO_SCHEMA`, and table/view grants.
 - Genie call fails: verify `GENIE_SPACE_ID`, `CAN RUN`, and access to the underlying views.
 - Generated SQL does not run: the app only executes SQL that starts with `SELECT` or `WITH` and does not contain write or DDL keywords.
