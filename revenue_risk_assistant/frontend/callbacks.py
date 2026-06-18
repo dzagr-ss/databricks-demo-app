@@ -24,6 +24,7 @@ def register_callbacks(app) -> None:
         Output("monthly-revenue-chart", "figure"),
         Output("product-revenue-chart", "figure"),
         Output("risk-grid-container", "children"),
+        Output("metrics-year-badge", "children"),
         Input("year-filter", "value"),
         Input("refresh-button", "n_clicks"),
     )(update_dashboard)
@@ -58,21 +59,21 @@ def load_years(_n_clicks):
 def update_dashboard(selected_year, _n_clicks):
     if not selected_year:
         message = "Select a year after the SQL warehouse and demo views are available."
-        return [error_panel("Dashboard data is not loaded", message)], {}, {}, html.Div(message)
+        return [error_panel("Dashboard data is not loaded", message)], {}, {}, html.Div(message), ""
 
     try:
         year = int(selected_year)
         data = fetch_dashboard_data(year)
     except Exception as exc:
         detail = str(exc)
-        return [error_panel("Dashboard query failed", detail)], {}, {}, error_panel("Risk table unavailable", detail)
+        return [error_panel("Dashboard query failed", detail)], {}, {}, error_panel("Risk table unavailable", detail), ""
 
     cards = build_metric_cards(data["kpi"], data["support"], year)
     monthly_fig = monthly_revenue_figure(data["monthly"])
     product_fig = product_revenue_figure(data["product"])
     risk_grid = df_to_grid(data["risk"], page_size=12, height=410)
 
-    return cards, monthly_fig, product_fig, risk_grid
+    return cards, monthly_fig, product_fig, risk_grid, f"Year {year}"
 
 
 def submit_genie_question(_n_clicks, preset_question, custom_question, conversation_id, chat_history):
