@@ -7,7 +7,7 @@ from revenue_risk_assistant.backend.genie_client import ask_genie, extract_text_
 from revenue_risk_assistant.backend.sql_client import run_sql
 from revenue_risk_assistant.backend.sql_guard import readonly_sql
 from revenue_risk_assistant.frontend.callback_helpers import build_metric_cards, render_chat_history
-from revenue_risk_assistant.frontend.charts import auto_figure, monthly_revenue_figure, product_revenue_figure
+from revenue_risk_assistant.frontend.charts import auto_figure, cancellation_segment_figure, property_type_value_figure
 from revenue_risk_assistant.frontend.components import empty_result, error_panel
 from revenue_risk_assistant.frontend.grids import df_to_grid
 
@@ -64,7 +64,7 @@ def load_years(_n_clicks):
 
 def update_dashboard(selected_year, _n_clicks):
     if not selected_year:
-        message = "Select a year after the SQL warehouse and demo views are available."
+        message = "Select a year after the SQL warehouse and Wanderbricks views are available."
         return [error_panel("Dashboard data is not loaded", message)], {}, {}, html.Div(message), ""
 
     try:
@@ -74,10 +74,10 @@ def update_dashboard(selected_year, _n_clicks):
         detail = str(exc)
         return [error_panel("Dashboard query failed", detail)], {}, {}, error_panel("Risk table unavailable", detail), ""
 
-    cards = build_metric_cards(data["kpi"], data["support"], year)
-    monthly_fig = monthly_revenue_figure(data["monthly"])
-    product_fig = product_revenue_figure(data["product"])
-    risk_grid = df_to_grid(data["risk"], page_size=12, height=410)
+    cards = build_metric_cards(data["kpi"], year)
+    monthly_fig = property_type_value_figure(data["property_type"])
+    product_fig = cancellation_segment_figure(data["cancellation"])
+    risk_grid = df_to_grid(data["opportunities"], page_size=12, height=410)
 
     return cards, monthly_fig, product_fig, risk_grid, f"Year {year}"
 

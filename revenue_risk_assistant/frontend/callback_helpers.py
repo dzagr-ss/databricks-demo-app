@@ -3,21 +3,21 @@ from dash import html
 from revenue_risk_assistant.frontend.components import metric_card
 
 
-def build_metric_cards(kpi, support, year: int) -> list[html.Div]:
+def build_metric_cards(kpi, year: int) -> list[html.Div]:
     return [
         metric_card("Booked revenue", f"{float(kpi['booked_revenue'] or 0):,.0f}", "Confirmed stays", "revenue"),
-        metric_card("Est. margin", f"{float(kpi['gross_margin'] or 0):,.0f}", "Modeled at 18%", "margin"),
-        metric_card("Active guests", f"{int(kpi['active_customers'] or 0):,}", f"Year {year}", "customers"),
+        metric_card("Booked nights", f"{int(kpi['booked_nights'] or 0):,}", f"Year {year}", "margin"),
+        metric_card("Bookings", f"{int(kpi['booking_count'] or 0):,}", "Confirmed", "customers"),
         metric_card(
             "Cancellation rate",
-            f"{float(kpi['exception_rate_pct'] or 0):.1f}%",
+            f"{float(kpi['cancellation_rate_pct'] or 0):.1f}%",
             "Cancelled bookings",
             "risk",
         ),
         metric_card(
-            "Open quality signals",
-            f"{int(support['open_tickets'] or 0):,}",
-            f"Avg CSAT {float(support['avg_csat'] or 0):.2f}",
+            "Weak-review value",
+            f"{int(kpi['high_value_weak_review_properties'] or 0):,}",
+            f"Avg rating {float(kpi['avg_rating'] or 0):.2f}",
             "support",
         ),
     ]

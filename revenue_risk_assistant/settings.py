@@ -11,6 +11,7 @@ DEMO_SCHEMA = os.getenv("DEMO_SCHEMA", "workspace.demo_dash_genie")
 ORDERS_VIEW = f"{DEMO_SCHEMA}.orders_enriched"
 TICKETS_VIEW = f"{DEMO_SCHEMA}.support_tickets_enriched"
 HEALTH_VIEW = f"{DEMO_SCHEMA}.customer_health_360"
+PROPERTY_VALUE_VIEW = f"{DEMO_SCHEMA}.property_value_360"
 
 PLOT_TEMPLATE = "plotly_white"
 

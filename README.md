@@ -28,16 +28,7 @@ The app follows the PDF runbook's security model: no PATs or hardcoded workspace
 
 ## Required Unity Catalog objects
 
-First choose a catalog that exists in your workspace:
-
-```sql
-SHOW CATALOGS;
-```
-
-The PDF uses `main.demo_dash_genie`, but this workspace has `workspace` instead of `main`. Use one of these options:
-
 - Run [sql/setup_wanderbricks_workspace.sql](sql/setup_wanderbricks_workspace.sql) and set `DEMO_SCHEMA=workspace.demo_dash_genie`.
-- Use another catalog from `SHOW CATALOGS`; replace `workspace.demo_dash_genie` in the SQL file and set `DEMO_SCHEMA=<your_catalog>.demo_dash_genie`.
 
 The app defaults to `workspace.demo_dash_genie`. With the Wanderbricks setup, the SQL creates curated views over `samples.wanderbricks`:
 

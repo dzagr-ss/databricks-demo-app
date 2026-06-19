@@ -18,7 +18,7 @@ SELECT
   p.property_type,
   p.host_id,
   d.destination_id,
-  d.name AS destination_name,
+  d.destination AS destination_name,
   b.check_in,
   b.check_out,
   DATEDIFF(b.check_out, b.check_in) AS stay_nights,
@@ -71,7 +71,7 @@ SELECT
   p.title AS property_title,
   p.property_type,
   d.destination_id,
-  d.name AS destination_name,
+  d.destination AS destination_name,
   r.rating,
   r.is_deleted
 FROM samples.wanderbricks.reviews r

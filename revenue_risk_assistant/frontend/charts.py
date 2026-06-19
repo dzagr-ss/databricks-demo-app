@@ -39,38 +39,53 @@ def _apply_chart_style(fig: go.Figure) -> go.Figure:
     return fig
 
 
-def monthly_revenue_figure(df: pd.DataFrame):
-    fig = px.line(
-        df,
-        x="order_month",
-        y="booked_revenue",
-        markers=True,
-        template=PLOT_TEMPLATE,
-        color_discrete_sequence=[CHART_COLORS["primary"]],
-    )
-    fig.update_traces(
-        line=dict(width=2.5),
-        marker=dict(size=7, line=dict(width=1.5, color="#ffffff")),
-        hovertemplate="<b>%{x}</b><br>Revenue: %{y:,.0f}<extra></extra>",
-    )
-    fig.update_layout(xaxis_title=None, yaxis_title=None)
-    return _apply_chart_style(fig)
-
-
-def product_revenue_figure(df: pd.DataFrame):
+def property_type_value_figure(df: pd.DataFrame):
     fig = px.bar(
         df,
-        x="product_family",
+        x="property_type",
         y="booked_revenue",
-        hover_data={"margin_pct": ":.1f", "booked_revenue": ":,.0f"},
         template=PLOT_TEMPLATE,
         color="booked_revenue",
         color_continuous_scale=["#fee2e2", CHART_COLORS["primary"]],
     )
-    fig.update_traces(hovertemplate="<b>%{x}</b><br>Revenue: %{y:,.0f}<br>Margin: %{customdata[0]:.1f}%<extra></extra>")
+    fig.update_traces(
+        customdata=df[["booking_count", "avg_booking_value", "avg_rating"]].to_numpy(),
+        hovertemplate=(
+            "<b>%{x}</b><br>Revenue: %{y:,.0f}<br>"
+            "Bookings: %{customdata[0]:,}<br>"
+            "Avg booking: %{customdata[1]:,.0f}<br>"
+            "Avg rating: %{customdata[2]:.2f}<extra></extra>"
+        )
+    )
     fig.update_layout(
         xaxis_title=None,
         yaxis_title=None,
+        coloraxis_showscale=False,
+        showlegend=False,
+    )
+    return _apply_chart_style(fig)
+
+
+def cancellation_segment_figure(df: pd.DataFrame):
+    fig = px.bar(
+        df,
+        x="segment",
+        y="cancellation_rate_pct",
+        template=PLOT_TEMPLATE,
+        color_discrete_sequence=[CHART_COLORS["secondary"]],
+    )
+    fig.update_traces(
+        customdata=df[["bookings", "cancelled_bookings", "booked_revenue"]].to_numpy(),
+        hovertemplate=(
+            "<b>%{x}</b><br>Cancellation rate: %{y:.1f}%<br>"
+            "Bookings: %{customdata[0]:,}<br>"
+            "Cancelled: %{customdata[1]:,}<br>"
+            "Revenue: %{customdata[2]:,.0f}<extra></extra>"
+        )
+    )
+    fig.update_layout(
+        xaxis_title=None,
+        yaxis_title="Cancellation rate",
         coloraxis_showscale=False,
         showlegend=False,
     )

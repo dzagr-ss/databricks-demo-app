@@ -22,7 +22,7 @@ def build_layout() -> html.Div:
                                 [
                                     section_header(
                                         "Key metrics",
-                                        "Snapshot for the selected order year.",
+                                        "Marketplace value snapshot for the selected booking year.",
                                         badge_id="metrics-year-badge",
                                     ),
                                     loading_region(
@@ -43,8 +43,8 @@ def build_layout() -> html.Div:
                             html.Section(
                                 [
                                     section_header(
-                                        "Revenue trends",
-                                        "Monthly performance and property type mix for the selected year.",
+                                        "Value and cancellation mix",
+                                        "Property type revenue and cancellation rate by guest segment.",
                                     ),
                                     loading_region(
                                         html.Div(
@@ -66,8 +66,8 @@ def build_layout() -> html.Div:
                             html.Section(
                                 [
                                     section_header(
-                                        "Customer health risk",
-                                        "Ranked by risk bucket and booked revenue. Sort and filter columns to drill in.",
+                                        "Property value opportunities",
+                                        "Properties ranked by revenue, review quality, and cancellation pressure.",
                                     ),
                                     loading_region(
                                         html.Div(
@@ -77,7 +77,7 @@ def build_layout() -> html.Div:
                                             ],
                                             className="loading-stack",
                                         ),
-                                        "Loading customer risk",
+                                        "Loading property opportunities",
                                         target_components={"risk-grid-container": "children"},
                                     ),
                                 ],
@@ -230,16 +230,16 @@ def build_chart_section() -> html.Div:
         [
             html.Div(
                 [
-                    html.H3("Monthly booked revenue"),
-                    html.P("Booked orders grouped by order month."),
+                    html.H3("Revenue by property type"),
+                    html.P("Booked revenue, booking count, and review quality."),
                     dcc.Graph(id="monthly-revenue-chart", config={"displayModeBar": False}),
                 ],
                 className="chart-card",
             ),
             html.Div(
                 [
-                    html.H3("Revenue by property type"),
-                    html.P("Hover for margin percentage."),
+                    html.H3("Cancellation rate by segment"),
+                    html.P("Guest segment cancellation rate and revenue context."),
                     dcc.Graph(id="product-revenue-chart", config={"displayModeBar": False}),
                 ],
                 className="chart-card",
