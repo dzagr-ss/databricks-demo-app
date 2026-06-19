@@ -2,7 +2,7 @@ import json
 
 from dash import Input, Output, State, html, no_update
 
-from revenue_risk_assistant.backend.dashboard_data import fetch_dashboard_data, fetch_years
+from revenue_risk_assistant.backend.dashboard_data import fetch_dashboard_data
 from revenue_risk_assistant.backend.genie_client import ask_genie, extract_text_and_sql
 from revenue_risk_assistant.backend.sql_client import run_sql
 from revenue_risk_assistant.backend.sql_guard import readonly_sql
@@ -13,12 +13,6 @@ from revenue_risk_assistant.frontend.grids import df_to_grid
 
 
 def register_callbacks(app) -> None:
-    app.callback(
-        Output("year-filter", "options"),
-        Output("year-filter", "value"),
-        Input("refresh-button", "n_clicks"),
-    )(load_years)
-
     app.callback(
         Output("kpi-cards", "children"),
         Output("monthly-revenue-chart", "figure"),
@@ -50,16 +44,6 @@ def register_callbacks(app) -> None:
         Output("custom-question", "value"),
         Input("preset-question", "value"),
     )(sync_preset_question)
-
-
-def load_years(_n_clicks):
-    try:
-        years = fetch_years()
-    except Exception:
-        return [], None
-
-    options = [{"label": str(year), "value": year} for year in years]
-    return options, max(years) if years else None
 
 
 def update_dashboard(selected_year, _n_clicks):

@@ -1,14 +1,6 @@
 from revenue_risk_assistant.settings import HEALTH_VIEW, ORDERS_VIEW, PROPERTY_VALUE_VIEW, TICKETS_VIEW
 
 
-def years_query() -> str:
-    return f"""
-    SELECT DISTINCT order_year
-    FROM {ORDERS_VIEW}
-    ORDER BY order_year
-    """
-
-
 def kpi_query(year: int) -> str:
     return f"""
     WITH bookings AS (
@@ -29,16 +21,16 @@ def kpi_query(year: int) -> str:
         FROM {TICKETS_VIEW}
         WHERE ticket_year = {year}
     ),
-    weak_review_properties AS (
+    weak_review_value AS (
         SELECT
-            COUNT(DISTINCT o.property_id) AS high_value_weak_review_properties
+            ROUND(SUM(CASE WHEN o.order_status = 'Booked' THEN o.revenue_amount ELSE 0 END), 2) AS weak_review_booked_revenue,
+            COUNT(DISTINCT o.property_id) AS weak_review_properties
         FROM {ORDERS_VIEW} o
         JOIN {PROPERTY_VALUE_VIEW} p
           ON o.property_id = p.property_id
         WHERE
             o.order_year = {year}
-            AND p.booked_revenue >= 10000
-            AND p.avg_rating < 4
+            AND p.weak_review_count > 0
     )
     SELECT
         COALESCE(b.booked_revenue, 0) AS booked_revenue,
@@ -46,10 +38,11 @@ def kpi_query(year: int) -> str:
         COALESCE(b.booked_nights, 0) AS booked_nights,
         COALESCE(b.cancellation_rate_pct, 0) AS cancellation_rate_pct,
         COALESCE(q.avg_rating, 0) AS avg_rating,
-        COALESCE(w.high_value_weak_review_properties, 0) AS high_value_weak_review_properties
+        COALESCE(w.weak_review_booked_revenue, 0) AS weak_review_booked_revenue,
+        COALESCE(w.weak_review_properties, 0) AS weak_review_properties
     FROM bookings b
     CROSS JOIN quality q
-    CROSS JOIN weak_review_properties w
+    CROSS JOIN weak_review_value w
     """
 
 

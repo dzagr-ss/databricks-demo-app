@@ -6,6 +6,9 @@ from revenue_risk_assistant.frontend.components import section_header, status_ba
 from revenue_risk_assistant.frontend.questions import DEFAULT_QUESTION, PRESET_QUESTIONS
 from revenue_risk_assistant.settings import DEMO_SCHEMA, GENIE_SPACE_ID, WAREHOUSE_ID
 
+DEMO_YEARS = [2022, 2023, 2024, 2025]
+DEFAULT_DEMO_YEAR = 2025
+
 
 def build_layout() -> html.Div:
     return html.Div(
@@ -190,15 +193,13 @@ def build_toolbar() -> html.Div:
                     html.Div(
                         [
                             html.Label("Order year", htmlFor="year-filter", className="toolbar-label"),
-                            loading_region(
-                                dcc.Dropdown(
-                                    id="year-filter",
-                                    clearable=False,
-                                    className="year-filter",
-                                    placeholder="Select year...",
-                                ),
-                                "Loading years",
-                                target_components={"year-filter": ["options", "value"]},
+                            dcc.Dropdown(
+                                id="year-filter",
+                                options=[{"label": str(year), "value": year} for year in DEMO_YEARS],
+                                value=DEFAULT_DEMO_YEAR,
+                                clearable=False,
+                                className="year-filter",
+                                placeholder="Select year...",
                             ),
                         ],
                         className="toolbar-field",

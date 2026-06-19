@@ -16,8 +16,8 @@ def build_metric_cards(kpi, year: int) -> list[html.Div]:
         ),
         metric_card(
             "Weak-review value",
-            f"{int(kpi['high_value_weak_review_properties'] or 0):,}",
-            f"Avg rating {float(kpi['avg_rating'] or 0):.2f}",
+            f"{float(kpi['weak_review_booked_revenue'] or 0):,.0f}",
+            f"{int(kpi['weak_review_properties'] or 0):,} properties · Avg rating {float(kpi['avg_rating'] or 0):.2f}",
             "support",
         ),
     ]
