@@ -1,6 +1,6 @@
 # Databricks Dash + Genie POC
 
-This project is a sample Databricks App called Revenue Risk Assistant. It uses Dash, Plotly, AG Grid, Databricks SQL, Unity Catalog views, and an AI/BI Genie Space.
+This project is a sample Databricks App called Wanderbricks Revenue Assistant. It uses Dash, Plotly, AG Grid, Databricks SQL, Unity Catalog views, and an AI/BI Genie Space.
 
 The app follows the PDF runbook's security model: no PATs or hardcoded workspace values, a SQL warehouse and Genie Space injected as Databricks App resources, and Databricks unified authentication for local development.
 
@@ -11,8 +11,9 @@ The app follows the PDF runbook's security model: no PATs or hardcoded workspace
 - `revenue_risk_assistant/frontend/` - Dash layout, callbacks, reusable UI components, charts, grids, and preset questions.
 - `app.yaml` - Databricks App runtime command and resource environment variables.
 - `requirements.txt` - Python dependencies.
+- `sql/setup_wanderbricks_workspace.sql` - Curated Wanderbricks semantic views using `samples.wanderbricks` as the source and `workspace.demo_dash_genie` as the app schema.
 - `sql/setup_demo_data.sql` - Synthetic Unity Catalog tables and curated views using the PDF default `main.demo_dash_genie`.
-- `sql/setup_demo_data_workspace.sql` - Same demo objects using `workspace.demo_dash_genie`, matching this workspace.
+- `sql/setup_demo_data_workspace.sql` - Synthetic demo objects using `workspace.demo_dash_genie`.
 - `sql/setup_demo_data_hive_metastore.sql` - Same demo objects using `hive_metastore.demo_dash_genie` for workspaces without a `main` catalog.
 - `.env.example` - Local development environment template.
 
@@ -35,52 +36,58 @@ SHOW CATALOGS;
 
 The PDF uses `main.demo_dash_genie`, but this workspace has `workspace` instead of `main`. Use one of these options:
 
-- Run [sql/setup_demo_data_workspace.sql](sql/setup_demo_data_workspace.sql) and set `DEMO_SCHEMA=workspace.demo_dash_genie`.
+- Run [sql/setup_wanderbricks_workspace.sql](sql/setup_wanderbricks_workspace.sql) and set `DEMO_SCHEMA=workspace.demo_dash_genie`.
 - Use another catalog from `SHOW CATALOGS`; replace `workspace.demo_dash_genie` in the SQL file and set `DEMO_SCHEMA=<your_catalog>.demo_dash_genie`.
 
-The app defaults to `workspace.demo_dash_genie`. With that default, the setup SQL creates:
+The app defaults to `workspace.demo_dash_genie`. With the Wanderbricks setup, the SQL creates curated views over `samples.wanderbricks`:
 
-- `workspace.demo_dash_genie.customers`
-- `workspace.demo_dash_genie.orders`
-- `workspace.demo_dash_genie.support_tickets`
+- `workspace.demo_dash_genie.bookings_enriched`
 - `workspace.demo_dash_genie.orders_enriched`
+- `workspace.demo_dash_genie.reviews_enriched`
 - `workspace.demo_dash_genie.support_tickets_enriched`
+- `workspace.demo_dash_genie.property_value_360`
+- `workspace.demo_dash_genie.destination_quality_360`
 - `workspace.demo_dash_genie.customer_health_360`
+- `workspace.demo_dash_genie.repeat_value_360`
 
 ## Genie Space setup
 
-Create a Genie Space named `Revenue Risk Genie` and add these curated views:
+Create a Genie Space named `Wanderbricks Revenue Genie` and add these curated views:
 
+- `workspace.demo_dash_genie.bookings_enriched`
 - `workspace.demo_dash_genie.orders_enriched`
+- `workspace.demo_dash_genie.reviews_enriched`
 - `workspace.demo_dash_genie.support_tickets_enriched`
+- `workspace.demo_dash_genie.property_value_360`
+- `workspace.demo_dash_genie.destination_quality_360`
 - `workspace.demo_dash_genie.customer_health_360`
+- `workspace.demo_dash_genie.repeat_value_360`
 
 Suggested instructions:
 
 ```text
-This Genie Space supports revenue risk and customer health analysis.
+This Genie Space supports travel marketplace revenue, property value, review quality, cancellation, and repeat value analysis using the Wanderbricks dataset.
 
 Business definitions:
-- Booked revenue means SUM(revenue_amount) where order_status = 'Booked'.
-- Gross margin amount means SUM(gross_margin_amount) where order_status = 'Booked'.
-- Gross margin percentage means gross margin amount divided by booked revenue.
-- Order exceptions mean orders where order_status is 'Cancelled' or 'Returned'.
-- Open tickets mean support tickets where ticket_status is 'Open' or 'In Progress'.
-- High-priority open tickets mean open tickets where priority = 'High'.
-- Customer risk is already calculated in customer_health_360.risk_bucket.
-- Customer health questions should usually use customer_health_360.
+- Booked revenue means SUM(revenue_amount) where order_status = 'Booked' in orders_enriched, or SUM(booked_revenue) in aggregate 360 views.
+- Estimated gross margin is modeled as 18% of booked revenue in the curated views.
+- Property type value questions should usually use property_value_360.
+- High-value bookings with weak reviews should use destination_quality_360 or property_value_360. Weak reviews are ratings of 3 or lower.
+- Cancellation rate means cancelled bookings divided by all bookings. For guest segment questions, use customer_health_360.segment and cancellation_rate_pct.
+- Repeat value questions should use repeat_value_360. It includes both guests and properties as entity_type values.
+- Customer risk is calculated in customer_health_360.risk_bucket from revenue, cancellation, and review-derived support signals.
 - Revenue trend questions should use orders_enriched and order_month.
-- Support trend questions should use support_tickets_enriched and ticket_month.
-- When ranking customers by business impact, rank by booked_revenue unless the user asks for margin, tickets, or CSAT.
+- Support and quality trend questions can use support_tickets_enriched and ticket_month.
+- When ranking business impact, rank by booked_revenue unless the user asks for margin, repeat bookings, cancellations, reviews, or CSAT.
 - Always show the time period used when answering trend questions.
 ```
 
 Test these questions in Genie before using the app:
 
-- Which customers are high risk and have the most booked revenue?
-- Show booked revenue and gross margin percentage by product family.
-- Which countries have the most open high-priority support tickets?
-- Show monthly booked revenue and order count.
+- Which property types generate the most value?
+- Where do high-value bookings have weak reviews?
+- What is the cancellation rate by segment?
+- Which guests or properties drive repeat value?
 
 ## Local run
 
@@ -109,12 +116,17 @@ For your specific error, make sure `.env` does not still contain `DEMO_SCHEMA=ma
 ```sql
 GRANT USE CATALOG ON CATALOG <your_catalog> TO `<app-service-principal>`;
 GRANT USE SCHEMA ON SCHEMA <your_catalog>.demo_dash_genie TO `<app-service-principal>`;
-GRANT SELECT ON TABLE <your_catalog>.demo_dash_genie.customers TO `<app-service-principal>`;
-GRANT SELECT ON TABLE <your_catalog>.demo_dash_genie.orders TO `<app-service-principal>`;
-GRANT SELECT ON TABLE <your_catalog>.demo_dash_genie.support_tickets TO `<app-service-principal>`;
+GRANT USE CATALOG ON CATALOG samples TO `<app-service-principal>`;
+GRANT USE SCHEMA ON SCHEMA samples.wanderbricks TO `<app-service-principal>`;
+GRANT SELECT ON SCHEMA samples.wanderbricks TO `<app-service-principal>`;
+GRANT SELECT ON VIEW <your_catalog>.demo_dash_genie.bookings_enriched TO `<app-service-principal>`;
 GRANT SELECT ON VIEW <your_catalog>.demo_dash_genie.orders_enriched TO `<app-service-principal>`;
+GRANT SELECT ON VIEW <your_catalog>.demo_dash_genie.reviews_enriched TO `<app-service-principal>`;
 GRANT SELECT ON VIEW <your_catalog>.demo_dash_genie.support_tickets_enriched TO `<app-service-principal>`;
+GRANT SELECT ON VIEW <your_catalog>.demo_dash_genie.property_value_360 TO `<app-service-principal>`;
+GRANT SELECT ON VIEW <your_catalog>.demo_dash_genie.destination_quality_360 TO `<app-service-principal>`;
 GRANT SELECT ON VIEW <your_catalog>.demo_dash_genie.customer_health_360 TO `<app-service-principal>`;
+GRANT SELECT ON VIEW <your_catalog>.demo_dash_genie.repeat_value_360 TO `<app-service-principal>`;
 ```
 
 Sync and deploy:

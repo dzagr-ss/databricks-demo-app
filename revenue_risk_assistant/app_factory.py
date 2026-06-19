@@ -18,7 +18,7 @@ FONT_LINK += (
 def create_app() -> Dash:
     app = Dash(
         __name__,
-        title="Revenue Risk Assistant",
+        title="Wanderbricks Revenue Assistant",
         suppress_callback_exceptions=True,
         assets_folder=str(ASSETS_FOLDER),
         meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}],

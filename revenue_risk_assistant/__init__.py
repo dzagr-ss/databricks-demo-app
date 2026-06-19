@@ -1,1 +1,1 @@
-"""Revenue Risk Assistant Dash app package."""
+"""Wanderbricks Revenue Assistant Dash app package."""

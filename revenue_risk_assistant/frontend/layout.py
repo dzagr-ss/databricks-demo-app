@@ -44,7 +44,7 @@ def build_layout() -> html.Div:
                                 [
                                     section_header(
                                         "Revenue trends",
-                                        "Monthly performance and product mix for the selected year.",
+                                        "Monthly performance and property type mix for the selected year.",
                                     ),
                                     loading_region(
                                         html.Div(
@@ -157,10 +157,10 @@ def build_header() -> html.Header:
                 [
                     html.Div(
                         [
-                            html.P("Revenue operations", className="eyebrow"),
-                            html.H1("Revenue Risk Assistant"),
+                            html.P("Travel marketplace analytics", className="eyebrow"),
+                            html.H1("Wanderbricks Revenue Assistant"),
                             html.P(
-                                "Monitor revenue, margin, and support health, then ask follow-up questions in plain language.",
+                                "Monitor bookings, property value, cancellations, and review quality, then ask follow-up questions in plain language.",
                                 className="lede",
                             ),
                         ],
@@ -238,7 +238,7 @@ def build_chart_section() -> html.Div:
             ),
             html.Div(
                 [
-                    html.H3("Revenue by product family"),
+                    html.H3("Revenue by property type"),
                     html.P("Hover for margin percentage."),
                     dcc.Graph(id="product-revenue-chart", config={"displayModeBar": False}),
                 ],
@@ -321,7 +321,7 @@ def build_genie_section() -> html.Div:
                             html.Label("Your question", htmlFor="custom-question", className="field-label"),
                             dcc.Textarea(
                                 id="custom-question",
-                                placeholder="e.g. Which high-risk customers have the most open tickets?",
+                                placeholder="e.g. Where do high-value bookings have weak reviews?",
                                 value=DEFAULT_QUESTION,
                                 className="question-textarea",
                             ),
