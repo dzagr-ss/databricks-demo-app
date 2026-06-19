@@ -37,6 +37,7 @@ def register_callbacks(app) -> None:
         Output("genie-result-chart", "figure"),
         Output("conversation-id", "data"),
         Output("raw-response", "children"),
+        Output("genie-results-panel", "className"),
         Input("ask-button", "n_clicks"),
         State("preset-question", "value"),
         State("custom-question", "value"),
@@ -44,6 +45,11 @@ def register_callbacks(app) -> None:
         State("chat-history", "data"),
         prevent_initial_call=True,
     )(submit_genie_question)
+
+    app.callback(
+        Output("custom-question", "value"),
+        Input("preset-question", "value"),
+    )(sync_preset_question)
 
 
 def load_years(_n_clicks):
@@ -76,10 +82,14 @@ def update_dashboard(selected_year, _n_clicks):
     return cards, monthly_fig, product_fig, risk_grid, f"Year {year}"
 
 
+def sync_preset_question(preset_question):
+    return preset_question or no_update
+
+
 def submit_genie_question(_n_clicks, preset_question, custom_question, conversation_id, chat_history):
     question = (custom_question or preset_question or "").strip()
     if not question:
-        return no_update, no_update, "", html.Div("Enter a question."), {}, conversation_id, ""
+        return no_update, no_update, "", html.Div("Enter a question."), {}, conversation_id, "", no_update
 
     chat_history = chat_history or []
     chat_history.append({"role": "User", "content": question})
@@ -109,6 +119,7 @@ def submit_genie_question(_n_clicks, preset_question, custom_question, conversat
             result_fig,
             new_conversation_id,
             json.dumps(message_dict, indent=2),
+            "genie-results-panel",
         )
     except Exception as exc:
         chat_history.append({"role": "Error", "content": str(exc)})
@@ -120,4 +131,5 @@ def submit_genie_question(_n_clicks, preset_question, custom_question, conversat
             {},
             conversation_id,
             str(exc),
+            "genie-results-panel",
         )

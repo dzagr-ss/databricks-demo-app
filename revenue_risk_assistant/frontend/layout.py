@@ -26,7 +26,13 @@ def build_layout() -> html.Div:
                                         badge_id="metrics-year-badge",
                                     ),
                                     loading_region(
-                                        html.Div(id="kpi-cards", className="metric-grid"),
+                                        html.Div(
+                                            [
+                                                html.Div(id="kpi-cards", className="metric-grid loading-content"),
+                                                build_metric_placeholders(),
+                                            ],
+                                            className="loading-stack",
+                                        ),
                                         "Loading metrics",
                                         target_components={"kpi-cards": "children"},
                                     ),
@@ -41,7 +47,13 @@ def build_layout() -> html.Div:
                                         "Monthly performance and product mix for the selected year.",
                                     ),
                                     loading_region(
-                                        build_chart_section(),
+                                        html.Div(
+                                            [
+                                                build_chart_section(),
+                                                build_chart_placeholders(),
+                                            ],
+                                            className="loading-stack",
+                                        ),
                                         "Loading charts",
                                         target_components={
                                             "monthly-revenue-chart": "figure",
@@ -58,7 +70,13 @@ def build_layout() -> html.Div:
                                         "Ranked by risk bucket and booked revenue. Sort and filter columns to drill in.",
                                     ),
                                     loading_region(
-                                        html.Div(id="risk-grid-container", className="grid-container"),
+                                        html.Div(
+                                            [
+                                                html.Div(id="risk-grid-container", className="grid-container loading-content"),
+                                                build_table_placeholder(),
+                                            ],
+                                            className="loading-stack",
+                                        ),
                                         "Loading customer risk",
                                         target_components={"risk-grid-container": "children"},
                                     ),
@@ -227,7 +245,56 @@ def build_chart_section() -> html.Div:
                 className="chart-card",
             ),
         ],
-        className="chart-grid",
+        className="chart-grid loading-content",
+    )
+
+
+def build_metric_placeholders() -> html.Div:
+    return html.Div(
+        [
+            html.Div(
+                [
+                    html.Div(className="skeleton-line skeleton-line-short"),
+                    html.Div(className="skeleton-line skeleton-line-value"),
+                    html.Div(className="skeleton-line skeleton-line-small"),
+                ],
+                className="metric-card skeleton-card",
+            )
+            for _ in range(5)
+        ],
+        className="metric-grid loading-placeholder",
+    )
+
+
+def build_chart_placeholders() -> html.Div:
+    return html.Div(
+        [
+            html.Div(
+                [
+                    html.Div(className="skeleton-line skeleton-line-title"),
+                    html.Div(className="chart-skeleton-bars"),
+                ],
+                className="chart-card skeleton-card",
+            ),
+            html.Div(
+                [
+                    html.Div(className="skeleton-line skeleton-line-title"),
+                    html.Div(className="chart-skeleton-bars"),
+                ],
+                className="chart-card skeleton-card",
+            ),
+        ],
+        className="chart-grid loading-placeholder",
+    )
+
+
+def build_table_placeholder() -> html.Div:
+    return html.Div(
+        [
+            html.Div(className="table-skeleton-header"),
+            *[html.Div(className="table-skeleton-row") for _ in range(8)],
+        ],
+        className="table-skeleton loading-placeholder",
     )
 
 
@@ -255,6 +322,7 @@ def build_genie_section() -> html.Div:
                             dcc.Textarea(
                                 id="custom-question",
                                 placeholder="e.g. Which high-risk customers have the most open tickets?",
+                                value=DEFAULT_QUESTION,
                                 className="question-textarea",
                             ),
                         ],
@@ -278,20 +346,28 @@ def build_genie_section() -> html.Div:
                 target_components={"chat-window": "children"},
             ),
             loading_region(
-                build_genie_outputs(),
+                html.Div(
+                    [
+                        build_genie_outputs(),
+                        html.Details(
+                            [
+                                html.Summary("Developer: raw Genie response"),
+                                html.Pre(id="raw-response", className="raw-response"),
+                            ],
+                            className="raw-details",
+                        ),
+                    ],
+                    id="genie-results-panel",
+                    className="genie-results-panel is-hidden",
+                ),
                 "Running generated query",
                 target_components={
+                    "genie-results-panel": "className",
                     "sql-code": "children",
                     "genie-result-grid": "children",
                     "genie-result-chart": "figure",
+                    "raw-response": "children",
                 },
-            ),
-            html.Details(
-                [
-                    html.Summary("Developer: raw Genie response"),
-                    html.Pre(id="raw-response", className="raw-response"),
-                ],
-                className="raw-details",
             ),
         ],
         className="genie-body",
