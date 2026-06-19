@@ -75,14 +75,51 @@ def build_header() -> html.Header:
         [
             html.Div(
                 [
-                    html.P("Databricks Apps · Dash · Genie", className="eyebrow"),
-                    html.H1("Revenue Risk Assistant"),
-                    html.P(
-                        "Monitor revenue, margin, and support health — then ask follow-up questions in plain language.",
-                        className="lede",
+                    html.Div(
+                        [
+                            html.Div("RA", className="brand-mark"),
+                            html.Div(
+                                [
+                                    html.P("Databricks Apps", className="brand-label"),
+                                    html.P("Dash + Genie workspace", className="brand-subtitle"),
+                                ],
+                                className="brand-copy",
+                            ),
+                        ],
+                        className="brand-lockup",
+                    ),
+                    html.Div(
+                        [
+                            status_badge("Genie Space", bool(GENIE_SPACE_ID)),
+                            status_badge("SQL Warehouse", bool(WAREHOUSE_ID)),
+                        ],
+                        className="header-status",
                     ),
                 ],
-                className="title-block",
+                className="header-top",
+            ),
+            html.Div(
+                [
+                    html.Div(
+                        [
+                            html.P("Revenue operations", className="eyebrow"),
+                            html.H1("Revenue Risk Assistant"),
+                            html.P(
+                                "Monitor revenue, margin, and support health, then ask follow-up questions in plain language.",
+                                className="lede",
+                            ),
+                        ],
+                        className="title-block",
+                    ),
+                    html.Div(
+                        [
+                            html.Span("Demo schema", className="meta-label"),
+                            html.Code(DEMO_SCHEMA, className="meta-code"),
+                        ],
+                        className="header-meta",
+                    ),
+                ],
+                className="header-content",
             ),
         ],
         className="app-header",
@@ -94,12 +131,18 @@ def build_toolbar() -> html.Div:
         [
             html.Div(
                 [
-                    html.Label("Order year", htmlFor="year-filter", className="toolbar-label"),
-                    dcc.Dropdown(
-                        id="year-filter",
-                        clearable=False,
-                        className="year-filter",
-                        placeholder="Select year…",
+                    html.Span("Filters", className="toolbar-title"),
+                    html.Div(
+                        [
+                            html.Label("Order year", htmlFor="year-filter", className="toolbar-label"),
+                            dcc.Dropdown(
+                                id="year-filter",
+                                clearable=False,
+                                className="year-filter",
+                                placeholder="Select year...",
+                            ),
+                        ],
+                        className="toolbar-field",
                     ),
                 ],
                 className="toolbar-group",
@@ -152,36 +195,41 @@ def build_genie_section() -> html.Div:
         [
             html.Div(
                 [
-                    html.Label("Suggested questions", htmlFor="preset-question", className="field-label"),
-                    dcc.Dropdown(
-                        id="preset-question",
-                        options=PRESET_QUESTIONS,
-                        value=DEFAULT_QUESTION,
-                        clearable=False,
-                        className="question-select",
+                    html.Div(
+                        [
+                            html.Label("Suggested questions", htmlFor="preset-question", className="field-label"),
+                            dcc.Dropdown(
+                                id="preset-question",
+                                options=PRESET_QUESTIONS,
+                                value=DEFAULT_QUESTION,
+                                clearable=False,
+                                className="question-select",
+                            ),
+                        ],
+                        className="genie-field",
+                    ),
+                    html.Div(
+                        [
+                            html.Label("Your question", htmlFor="custom-question", className="field-label"),
+                            dcc.Textarea(
+                                id="custom-question",
+                                placeholder="e.g. Which high-risk customers have the most open tickets?",
+                                className="question-textarea",
+                            ),
+                        ],
+                        className="genie-field",
+                    ),
+                    html.Button(
+                        [
+                            html.Span(className="btn-icon spark-icon"),
+                            "Ask Genie",
+                        ],
+                        id="ask-button",
+                        n_clicks=0,
+                        className="primary-button",
                     ),
                 ],
-                className="genie-field",
-            ),
-            html.Div(
-                [
-                    html.Label("Your question", htmlFor="custom-question", className="field-label"),
-                    dcc.Textarea(
-                        id="custom-question",
-                        placeholder="e.g. Which high-risk customers have the most open tickets?",
-                        className="question-textarea",
-                    ),
-                ],
-                className="genie-field",
-            ),
-            html.Button(
-                [
-                    html.Span(className="btn-icon spark-icon"),
-                    "Ask Genie",
-                ],
-                id="ask-button",
-                n_clicks=0,
-                className="primary-button",
+                className="genie-controls",
             ),
             html.Div(id="chat-window", className="chat-window"),
             build_genie_outputs(),

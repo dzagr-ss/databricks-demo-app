@@ -5,19 +5,19 @@ import plotly.graph_objects as go
 from revenue_risk_assistant.settings import PLOT_TEMPLATE
 
 CHART_COLORS = {
-    "primary": "#2563eb",
-    "primary_light": "#93c5fd",
-    "secondary": "#7c3aed",
-    "grid": "#e2e8f0",
-    "text": "#64748b",
+    "primary": "#ef4444",
+    "primary_light": "#fecaca",
+    "secondary": "#0891b2",
+    "grid": "#e5e7eb",
+    "text": "#6b7280",
 }
 
 CHART_LAYOUT = dict(
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)",
-    font=dict(family="Inter, ui-sans-serif, system-ui, sans-serif", color="#334155", size=12),
-    hoverlabel=dict(bgcolor="#0f172a", font_color="#f8fafc", font_size=12),
-    margin=dict(l=8, r=8, t=8, b=8),
+    font=dict(family="Inter, ui-sans-serif, system-ui, sans-serif", color="#374151", size=12),
+    hoverlabel=dict(bgcolor="#111827", font_color="#f9fafb", font_size=12),
+    margin=dict(l=8, r=8, t=10, b=8),
 )
 
 
@@ -50,7 +50,7 @@ def monthly_revenue_figure(df: pd.DataFrame):
     )
     fig.update_traces(
         line=dict(width=2.5),
-        marker=dict(size=7, line=dict(width=1, color="#ffffff")),
+        marker=dict(size=7, line=dict(width=1.5, color="#ffffff")),
         hovertemplate="<b>%{x}</b><br>Revenue: %{y:,.0f}<extra></extra>",
     )
     fig.update_layout(xaxis_title=None, yaxis_title=None)
@@ -65,7 +65,7 @@ def product_revenue_figure(df: pd.DataFrame):
         hover_data={"margin_pct": ":.1f", "booked_revenue": ":,.0f"},
         template=PLOT_TEMPLATE,
         color="booked_revenue",
-        color_continuous_scale=["#dbeafe", CHART_COLORS["primary"]],
+        color_continuous_scale=["#fee2e2", CHART_COLORS["primary"]],
     )
     fig.update_traces(hovertemplate="<b>%{x}</b><br>Revenue: %{y:,.0f}<br>Margin: %{customdata[0]:.1f}%<extra></extra>")
     fig.update_layout(
