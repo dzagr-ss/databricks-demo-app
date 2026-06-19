@@ -66,28 +66,43 @@ def property_type_value_figure(df: pd.DataFrame):
     return _apply_chart_style(fig)
 
 
-def cancellation_segment_figure(df: pd.DataFrame):
-    fig = px.bar(
-        df,
-        x="segment",
-        y="cancellation_rate_pct",
-        template=PLOT_TEMPLATE,
-        color_discrete_sequence=[CHART_COLORS["secondary"]],
+def monthly_revenue_bookings_figure(df: pd.DataFrame):
+    fig = go.Figure()
+    fig.add_trace(
+        go.Bar(
+            x=df["order_month"],
+            y=df["booked_revenue"],
+            name="Revenue",
+            marker_color=CHART_COLORS["primary"],
+            customdata=df[["booking_count"]].to_numpy(),
+            hovertemplate="<b>%{x}</b><br>Revenue: %{y:,.0f}<br>Bookings: %{customdata[0]:,}<extra></extra>",
+        )
     )
-    fig.update_traces(
-        customdata=df[["bookings", "cancelled_bookings", "booked_revenue"]].to_numpy(),
-        hovertemplate=(
-            "<b>%{x}</b><br>Cancellation rate: %{y:.1f}%<br>"
-            "Bookings: %{customdata[0]:,}<br>"
-            "Cancelled: %{customdata[1]:,}<br>"
-            "Revenue: %{customdata[2]:,.0f}<extra></extra>"
+    fig.add_trace(
+        go.Scatter(
+            x=df["order_month"],
+            y=df["booking_count"],
+            name="Bookings",
+            mode="lines+markers",
+            marker=dict(size=7, color=CHART_COLORS["secondary"], line=dict(width=1.5, color="#ffffff")),
+            line=dict(width=2.5, color=CHART_COLORS["secondary"]),
+            yaxis="y2",
+            hovertemplate="<b>%{x}</b><br>Bookings: %{y:,}<extra></extra>",
         )
     )
     fig.update_layout(
         xaxis_title=None,
-        yaxis_title="Cancellation rate",
-        coloraxis_showscale=False,
-        showlegend=False,
+        yaxis_title=None,
+        yaxis2=dict(
+            overlaying="y",
+            side="right",
+            showgrid=False,
+            title=None,
+            tickfont=dict(color=CHART_COLORS["text"]),
+            zeroline=False,
+        ),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
+        showlegend=True,
     )
     return _apply_chart_style(fig)
 

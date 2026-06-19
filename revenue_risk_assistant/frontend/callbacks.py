@@ -7,7 +7,7 @@ from revenue_risk_assistant.backend.genie_client import ask_genie, extract_text_
 from revenue_risk_assistant.backend.sql_client import run_sql
 from revenue_risk_assistant.backend.sql_guard import readonly_sql
 from revenue_risk_assistant.frontend.callback_helpers import build_metric_cards, render_chat_history
-from revenue_risk_assistant.frontend.charts import auto_figure, cancellation_segment_figure, property_type_value_figure
+from revenue_risk_assistant.frontend.charts import auto_figure, monthly_revenue_bookings_figure, property_type_value_figure
 from revenue_risk_assistant.frontend.components import empty_result, error_panel
 from revenue_risk_assistant.frontend.grids import df_to_grid
 
@@ -60,7 +60,7 @@ def update_dashboard(selected_year, _n_clicks):
 
     cards = build_metric_cards(data["kpi"], year)
     monthly_fig = property_type_value_figure(data["property_type"])
-    product_fig = cancellation_segment_figure(data["cancellation"])
+    product_fig = monthly_revenue_bookings_figure(data["monthly"])
     risk_grid = df_to_grid(data["opportunities"], page_size=12, height=410)
 
     return cards, monthly_fig, product_fig, risk_grid, f"Year {year}"

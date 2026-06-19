@@ -47,7 +47,7 @@ def build_layout() -> html.Div:
                                 [
                                     section_header(
                                         "Value and cancellation mix",
-                                        "Property type revenue and cancellation rate by guest segment.",
+                                        "Property type value and monthly booking momentum.",
                                     ),
                                     loading_region(
                                         html.Div(
@@ -239,8 +239,8 @@ def build_chart_section() -> html.Div:
             ),
             html.Div(
                 [
-                    html.H3("Cancellation rate by segment"),
-                    html.P("Guest segment cancellation rate and revenue context."),
+                    html.H3("Monthly revenue and bookings"),
+                    html.P("Booked revenue as bars with booking count trend."),
                     dcc.Graph(id="product-revenue-chart", config={"displayModeBar": False}),
                 ],
                 className="chart-card",

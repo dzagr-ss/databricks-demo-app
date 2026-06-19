@@ -67,21 +67,16 @@ def property_type_value_query(year: int) -> str:
     """
 
 
-def cancellation_by_segment_query(year: int) -> str:
+def monthly_revenue_bookings_query(year: int) -> str:
     return f"""
     SELECT
-        segment,
-        COUNT(*) AS bookings,
-        SUM(CASE WHEN order_status = 'Cancelled' THEN 1 ELSE 0 END) AS cancelled_bookings,
+        order_month,
         ROUND(SUM(CASE WHEN order_status = 'Booked' THEN revenue_amount ELSE 0 END), 2) AS booked_revenue,
-        ROUND(
-            100.0 * SUM(CASE WHEN order_status = 'Cancelled' THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0),
-            2
-        ) AS cancellation_rate_pct
+        SUM(CASE WHEN order_status = 'Booked' THEN 1 ELSE 0 END) AS booking_count
     FROM {ORDERS_VIEW}
     WHERE order_year = {year}
-    GROUP BY segment
-    ORDER BY cancellation_rate_pct DESC, booked_revenue DESC
+    GROUP BY order_month
+    ORDER BY order_month
     """
 
 
