@@ -1102,3 +1102,20 @@ h3 {
     gap: 6px;
   }
 }
+
+/* Keep skeletons controlled after grid and responsive display rules are applied. */
+.metric-grid.loading-placeholder,
+.chart-grid.loading-placeholder,
+.table-skeleton.loading-placeholder {
+  display: none;
+}
+
+.loading-parent:has([data-dash-is-loading="true"]) .loading-content {
+  display: none !important;
+}
+
+.loading-parent:has([data-dash-is-loading="true"]) .metric-grid.loading-placeholder,
+.loading-parent:has([data-dash-is-loading="true"]) .chart-grid.loading-placeholder,
+.loading-parent:has([data-dash-is-loading="true"]) .table-skeleton.loading-placeholder {
+  display: grid;
+}
