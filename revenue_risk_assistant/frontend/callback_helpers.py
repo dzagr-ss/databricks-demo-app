@@ -1,4 +1,4 @@
-from dash import html
+from dash import dcc, html
 
 from revenue_risk_assistant.frontend.components import metric_card
 
@@ -28,9 +28,15 @@ def render_chat_history(chat_history: list[dict]) -> list[html.Div]:
         html.Div(
             [
                 html.Div(item["role"], className="chat-role"),
-                html.Div(item["content"], className="chat-message-text"),
+                render_chat_content(item),
             ],
             className=f"chat-message {item['role'].lower()}",
         )
         for item in chat_history[-8:]
     ]
+
+
+def render_chat_content(item: dict):
+    if item["role"].lower() == "genie":
+        return dcc.Markdown(item["content"], className="chat-message-text markdown-body")
+    return html.Div(item["content"], className="chat-message-text")

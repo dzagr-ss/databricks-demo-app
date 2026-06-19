@@ -853,6 +853,81 @@ h3 {
   white-space: pre-wrap;
 }
 
+.markdown-body {
+  white-space: normal;
+}
+
+.markdown-body p,
+.markdown-body ul,
+.markdown-body ol,
+.markdown-body table,
+.markdown-body pre {
+  margin-bottom: 10px;
+}
+
+.markdown-body > :first-child {
+  margin-top: 0;
+}
+
+.markdown-body > :last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body strong {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 20px;
+}
+
+.markdown-body code {
+  background: #f3f4f6;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--ink);
+  font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.85em;
+  padding: 1px 5px;
+}
+
+.markdown-body pre {
+  background: #111827;
+  border-radius: var(--radius-sm);
+  color: #e5e7eb;
+  overflow: auto;
+  padding: 12px;
+}
+
+.markdown-body pre code {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  padding: 0;
+}
+
+.markdown-body table {
+  border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+}
+
+.markdown-body th,
+.markdown-body td {
+  border: 1px solid var(--border);
+  padding: 6px 8px;
+  text-align: left;
+}
+
+.markdown-body th {
+  background: #f9fafb;
+  color: var(--ink);
+  font-weight: 750;
+}
+
 .genie-output-grid {
   display: grid;
   gap: 12px;
