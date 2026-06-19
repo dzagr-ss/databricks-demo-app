@@ -1,3 +1,5 @@
+from typing import Optional
+
 from dash import dcc, html
 
 from revenue_risk_assistant.frontend.components import section_header, status_badge
@@ -23,7 +25,11 @@ def build_layout() -> html.Div:
                                         "Snapshot for the selected order year.",
                                         badge_id="metrics-year-badge",
                                     ),
-                                    html.Div(id="kpi-cards", className="metric-grid"),
+                                    loading_region(
+                                        html.Div(id="kpi-cards", className="metric-grid"),
+                                        "Loading metrics",
+                                        target_components={"kpi-cards": "children"},
+                                    ),
                                 ],
                                 className="dashboard-section",
                                 id="overview",
@@ -34,7 +40,14 @@ def build_layout() -> html.Div:
                                         "Revenue trends",
                                         "Monthly performance and product mix for the selected year.",
                                     ),
-                                    build_chart_section(),
+                                    loading_region(
+                                        build_chart_section(),
+                                        "Loading charts",
+                                        target_components={
+                                            "monthly-revenue-chart": "figure",
+                                            "product-revenue-chart": "figure",
+                                        },
+                                    ),
                                 ],
                                 className="dashboard-section",
                             ),
@@ -44,7 +57,11 @@ def build_layout() -> html.Div:
                                         "Customer health risk",
                                         "Ranked by risk bucket and booked revenue. Sort and filter columns to drill in.",
                                     ),
-                                    html.Div(id="risk-grid-container", className="grid-container"),
+                                    loading_region(
+                                        html.Div(id="risk-grid-container", className="grid-container"),
+                                        "Loading customer risk",
+                                        target_components={"risk-grid-container": "children"},
+                                    ),
                                 ],
                                 className="dashboard-section surface",
                             ),
@@ -67,6 +84,26 @@ def build_layout() -> html.Div:
             ),
         ],
         className="app-shell",
+    )
+
+
+def loading_region(children, message: str, target_components: Optional[dict] = None) -> dcc.Loading:
+    return dcc.Loading(
+        children=children,
+        className="loading-region",
+        custom_spinner=html.Div(
+            [
+                html.Span(className="loading-dot"),
+                html.Span(message, className="loading-text"),
+            ],
+            className="loading-indicator",
+        ),
+        delay_hide=200,
+        delay_show=250,
+        overlay_style={"visibility": "visible"},
+        parent_className="loading-parent",
+        show_initially=True,
+        target_components=target_components,
     )
 
 
@@ -135,11 +172,15 @@ def build_toolbar() -> html.Div:
                     html.Div(
                         [
                             html.Label("Order year", htmlFor="year-filter", className="toolbar-label"),
-                            dcc.Dropdown(
-                                id="year-filter",
-                                clearable=False,
-                                className="year-filter",
-                                placeholder="Select year...",
+                            loading_region(
+                                dcc.Dropdown(
+                                    id="year-filter",
+                                    clearable=False,
+                                    className="year-filter",
+                                    placeholder="Select year...",
+                                ),
+                                "Loading years",
+                                target_components={"year-filter": ["options", "value"]},
                             ),
                         ],
                         className="toolbar-field",
@@ -231,8 +272,20 @@ def build_genie_section() -> html.Div:
                 ],
                 className="genie-controls",
             ),
-            html.Div(id="chat-window", className="chat-window"),
-            build_genie_outputs(),
+            loading_region(
+                html.Div(id="chat-window", className="chat-window"),
+                "Waiting for Genie",
+                target_components={"chat-window": "children"},
+            ),
+            loading_region(
+                build_genie_outputs(),
+                "Running generated query",
+                target_components={
+                    "sql-code": "children",
+                    "genie-result-grid": "children",
+                    "genie-result-chart": "figure",
+                },
+            ),
             html.Details(
                 [
                     html.Summary("Developer: raw Genie response"),
