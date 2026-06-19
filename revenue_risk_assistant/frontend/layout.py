@@ -352,6 +352,13 @@ def build_genie_section() -> html.Div:
                         build_genie_outputs(),
                         html.Details(
                             [
+                                html.Summary("Generated SQL"),
+                                html.Pre(id="sql-code", className="sql-block"),
+                            ],
+                            className="raw-details",
+                        ),
+                        html.Details(
+                            [
                                 html.Summary("Developer: raw Genie response"),
                                 html.Pre(id="raw-response", className="raw-response"),
                             ],
@@ -380,15 +387,14 @@ def build_genie_outputs() -> html.Div:
         [
             html.Div(
                 [
-                    html.H3("Generated SQL"),
-                    html.Pre(id="sql-code", className="sql-block"),
+                    html.H3("Query result"),
+                    html.Div(id="genie-result-grid", className="grid-container"),
                 ],
                 className="genie-column",
             ),
             html.Div(
                 [
-                    html.H3("Query result"),
-                    html.Div(id="genie-result-grid", className="grid-container"),
+                    html.H3("Result chart"),
                     dcc.Graph(id="genie-result-chart", config={"displayModeBar": False}),
                 ],
                 className="genie-column",
