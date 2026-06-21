@@ -45,46 +45,29 @@ def build_layout() -> html.Div:
                             ),
                             html.Section(
                                 [
-                                    section_header(
-                                        "Value and cancellation mix",
-                                        "Property type value and monthly booking momentum.",
-                                    ),
-                                    loading_region(
-                                        html.Div(
-                                            [
-                                                build_chart_section(),
-                                                build_chart_placeholders(),
-                                            ],
-                                            className="loading-stack",
-                                        ),
-                                        "Loading charts",
-                                        target_components={
-                                            "monthly-revenue-chart": "figure",
-                                            "product-revenue-chart": "figure",
-                                        },
-                                    ),
-                                ],
-                                className="dashboard-section",
-                            ),
-                            html.Section(
-                                [
-                                    section_header(
-                                        "Property value opportunities",
-                                        "Properties ranked by revenue, review quality, and cancellation pressure.",
-                                    ),
-                                    loading_region(
-                                        html.Div(
-                                            [
-                                                html.Div(id="risk-grid-container", className="grid-container loading-content"),
-                                                build_table_placeholder(),
-                                            ],
-                                            className="loading-stack",
-                                        ),
-                                        "Loading property opportunities",
-                                        target_components={"risk-grid-container": "children"},
+                                    dcc.Tabs(
+                                        [
+                                            dcc.Tab(
+                                                build_native_analysis_tab(),
+                                                label="Native analysis",
+                                                value="native-analysis",
+                                                className="workspace-tab",
+                                                selected_className="workspace-tab is-selected",
+                                            ),
+                                            dcc.Tab(
+                                                build_embedded_dashboard_tab(),
+                                                label="Databricks dashboard",
+                                                value="databricks-dashboard",
+                                                className="workspace-tab",
+                                                selected_className="workspace-tab is-selected",
+                                            ),
+                                        ],
+                                        value="native-analysis",
+                                        className="workspace-tabs",
+                                        content_className="workspace-tab-content",
                                     ),
                                 ],
-                                className="dashboard-section surface",
+                                className="dashboard-section workspace-section",
                             ),
                             html.Section(
                                 [
@@ -247,6 +230,70 @@ def build_chart_section() -> html.Div:
             ),
         ],
         className="chart-grid loading-content",
+    )
+
+
+def build_native_analysis_tab() -> html.Div:
+    return html.Div(
+        [
+            html.Section(
+                [
+                    section_header(
+                        "Value and cancellation mix",
+                        "Property type value and monthly booking momentum.",
+                    ),
+                    loading_region(
+                        html.Div(
+                            [
+                                build_chart_section(),
+                                build_chart_placeholders(),
+                            ],
+                            className="loading-stack",
+                        ),
+                        "Loading charts",
+                        target_components={
+                            "monthly-revenue-chart": "figure",
+                            "product-revenue-chart": "figure",
+                        },
+                    ),
+                ],
+                className="dashboard-section",
+            ),
+            html.Section(
+                [
+                    section_header(
+                        "Property value opportunities",
+                        "Properties ranked by revenue, review quality, and cancellation pressure.",
+                    ),
+                    loading_region(
+                        html.Div(
+                            [
+                                html.Div(id="risk-grid-container", className="grid-container loading-content"),
+                                build_table_placeholder(),
+                            ],
+                            className="loading-stack",
+                        ),
+                        "Loading property opportunities",
+                        target_components={"risk-grid-container": "children"},
+                    ),
+                ],
+                className="dashboard-section surface",
+            ),
+        ],
+        className="native-analysis-tab",
+    )
+
+
+def build_embedded_dashboard_tab() -> html.Div:
+    return html.Div(
+        [
+            html.Iframe(
+                src="https://dbc-299a0d28-332a.cloud.databricks.com/embed/dashboardsv3/01f16d73d3ef1f55bb7009eabef3363b?o=2692195248225107",
+                title="Databricks Wanderbricks dashboard",
+                className="databricks-dashboard-frame",
+            )
+        ],
+        className="embedded-dashboard-tab",
     )
 
 
